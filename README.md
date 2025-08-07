@@ -146,11 +146,11 @@ The backend will run on `http://localhost:3000` and frontend on `http://localhos
 ### Environment Variables
 Create a `.env` file in the backend directory:
 
-\`\`\`env
+```env
 PORT=3000
 JWT_SECRET=your_jwt_secret_here
 NODE_ENV=development
-\`\`\`
+```
 
 ### Database Configuration
 The system uses SQLite3 by default. Configuration can be modified in `backend/knexfile.js`.

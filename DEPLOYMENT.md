@@ -66,7 +66,7 @@ This guide will help you deploy MediLink to production using Railway (backend) a
 3. **Set Environment Variables**
    - In Vercel dashboard, go to your project settings
    - Add environment variable:
-     - `VITE_API_URL`: `https://your-backend-url.up.railway.app`
+     - `API_BASE_URL`: `https://your-backend-url`
 
 4. **Configure Build Settings**
    - Build Command: `npm run build`
@@ -76,14 +76,14 @@ This guide will help you deploy MediLink to production using Railway (backend) a
 ## 🐳 Alternative: Docker Deployment
 
 ### Backend Docker
-\`\`\`bash
+```bash
 cd backend
 docker build -t medilink-backend .
 docker run -p 3000:3000 -e JWT_SECRET=your_secret medilink-backend
-\`\`\`
+```
 
 ### Frontend Docker
-\`\`\`dockerfile
+```dockerfile
 # frontend/Dockerfile
 FROM node:20-alpine as build
 WORKDIR /app
@@ -97,22 +97,22 @@ COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/nginx.conf
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
-\`\`\`
+```
 
 ## 🔐 Environment Variables
 
 ### Backend (.env)
-\`\`\`env
+```env
 NODE_ENV=production
 PORT=3000
 JWT_SECRET=your_super_secret_jwt_key_here_make_it_long_and_random
 DATABASE_PATH=/app/data/database.sqlite3
-\`\`\`
+```
 
 ### Frontend (.env.production)
-\`\`\`env
-VITE_API_URL=https://your-backend-domain.up.railway.app
-\`\`\`
+```env
+API_BASE_URL=https://your-backend-domain.up.railway.app
+```
 
 ## 📊 Database Setup
 
@@ -146,9 +146,9 @@ The SQLite database will be automatically created and seeded on first deployment
 ### Logs
 
 **Railway Logs:**
-\`\`\`bash
+```bash
 railway logs
-\`\`\`
+```
 
 **Vercel Logs:**
 - Check deployment logs in Vercel dashboard
