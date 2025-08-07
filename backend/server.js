@@ -7,63 +7,87 @@ require('dotenv').config();
 const knexConfig = require('./knexfile')[process.env.NODE_ENV || 'development'];
 const knex = require('knex')(knexConfig);
 
+// Route imports
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const doctorRoutes = require('./routes/doctors');
 const appointmentRoutes = require('./routes/appointments');
 const supplyRoutes = require('./routes/supplies');
 const reportRoutes = require('./routes/reports');
-const healthRoutes = require('./routes/health'); // Added health check route
+const healthRoutes = require('./routes/health'); // Health check
 const settingsRoutes = require('./routes/settings');
+
 const notificationService = require('./services/notificationService');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// ---------------------
 // Middleware
-app.use(helmet());
-// Parse CORS origins from environment variable
-const corsOrigins = process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : ['http://localhost:8080'];
+// ---------------------
 
-app.use(cors({
-  origin: corsOrigins,
-  credentials: true
-}));
+app.use(helmet());
 app.use(express.json());
 
+// Parse allowed CORS origins from env var
+const corsOrigins = process.env.CORS_ORIGINS
+  ? process.env.CORS_ORIGINS.split(',').map(origin => origin.trim())
+  : ['http://localhost:8080'];
+
+console.log('[CORS] Allowed origins:', corsOrigins);
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || corsOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS: ' + origin));
+    }
+  },
+  credentials: true,
+}));
+
+// ---------------------
 // Routes
+// ---------------------
+
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/doctors', doctorRoutes);
 app.use('/api/appointments', appointmentRoutes);
 app.use('/api/supplies', supplyRoutes);
 app.use('/api/reports', reportRoutes);
-app.use('/api/health', healthRoutes); // Added health check route
+app.use('/api/health', healthRoutes); // Health check
 app.use('/api/settings', settingsRoutes);
 
-// Scheduled tasks
+// ---------------------
+// Cron Tasks
+// ---------------------
+
 cron.schedule('0 7 * * *', () => {
-  console.log('Checking upcoming appointments for supply issues...');
+  console.log('[CRON] 07:00 - Check upcoming appointments for supply issues...');
   notificationService.checkUpcomingAppointmentSupplies();
 });
 
 cron.schedule('0 8 * * *', () => {
-  console.log('Running daily notification tasks...');
+  console.log('[CRON] 08:00 - Send daily reminders...');
   notificationService.sendDailyReminders();
 });
 
 cron.schedule('0 9 * * *', () => {
-  console.log('Checking low stock alerts...');
+  console.log('[CRON] 09:00 - Check low stock alerts...');
   notificationService.checkLowStockAlerts();
 });
 
-// Checking expiring supplies
 cron.schedule('0 10 * * *', () => {
-  console.log('Checking expiring supplies...');
+  console.log('[CRON] 10:00 - Check expiring supplies...');
   notificationService.checkExpiringSupplies();
 });
 
-// Ensure database is set up in production
+// ---------------------
+// Production DB Setup
+// ---------------------
+
 if (process.env.NODE_ENV === 'production') {
   knex.migrate.latest()
     .then(() => {
@@ -78,6 +102,10 @@ if (process.env.NODE_ENV === 'production') {
     });
 }
 
+// ---------------------
+// Start Server
+// ---------------------
+
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT} (env: ${process.env.NODE_ENV})`);
 });
