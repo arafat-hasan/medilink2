@@ -23,7 +23,7 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(helmet());
 // Parse CORS origins from environment variable
-const corsOrigins = process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : ['http://localhost:3000'];
+const corsOrigins = process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : ['http://localhost:8080'];
 
 app.use(cors({
   origin: corsOrigins,
