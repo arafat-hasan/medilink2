@@ -6,7 +6,7 @@ import './style.css'
 import axios from 'axios'
 
 // Set up axios defaults
-axios.defaults.baseURL = import.meta.env.API_BASE_URL || 'http://localhost:3000'
+axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'
 
 const app = createApp(App)
 const pinia = createPinia()
