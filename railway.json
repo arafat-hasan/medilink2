@@ -3,7 +3,6 @@
   "build": {
     "builder": "NIXPACKS",
     "buildCommand": "cd backend && npm run railway:build",
-    "watchPatterns": ["/backend/**"],
     "rootDirectory": "backend"
   },
   "deploy": {
