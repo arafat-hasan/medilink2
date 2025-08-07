@@ -1,4 +1,4 @@
 [build]
 builder = "DOCKERFILE"
-dockerfilePath = "Dockerfile"
-buildPath = "backend"
+dockerfilePath = "backend/Dockerfile"
+buildPath = ""
