@@ -28,24 +28,31 @@ const PORT = process.env.PORT || 3000;
 
 app.use(helmet());
 app.use(express.json());
+const corsEnabled = process.env.CORS_ENABLED === 'true';
 
-// Parse allowed CORS origins from env var
+// Parse allowed origins from env
 const corsOrigins = process.env.CORS_ORIGINS
-  ? process.env.CORS_ORIGINS.split(',').map(origin => origin.trim())
+  ? process.env.CORS_ORIGINS.split(',').map(o => o.trim())
   : ['http://localhost:8080'];
 
-console.log('[CORS] Allowed origins:', corsOrigins);
+if (corsEnabled) {
+  app.use(cors({
+    origin: function(origin, callback) {
+      if (!origin || corsOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
+  }));
+  console.log('✅ CORS enabled for origins:', corsOrigins);
+} else {
+  // Disable CORS restrictions entirely
+  app.use(cors());
+  console.log('⚠️ CORS disabled: allowing all origins');
+}
 
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || corsOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS: ' + origin));
-    }
-  },
-  credentials: true,
-}));
 
 // ---------------------
 // Routes
