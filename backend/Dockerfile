@@ -4,21 +4,16 @@ FROM node:20-alpine
 WORKDIR /app
 
 # Copy package files
-COPY --chown=node:node package.json package-lock.json ./
+COPY package.json package-lock.json ./
 
 # Install dependencies
 RUN npm ci --only=production
 
 # Copy source code
-COPY --chown=node:node . .
+COPY . .
 
-# Create database directory and set permissions
-RUN mkdir -p /app/data && \
-    chown -R node:node /app/data && \
-    chmod 755 /app/data
-
-# Switch to non-root user
-USER node
+# Create database directory
+RUN mkdir -p /app/data
 
 # Set environment variables
 ENV NODE_ENV=production
